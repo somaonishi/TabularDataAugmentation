@@ -10,7 +10,9 @@ test_batch_size: 10000
 model_name: TCN # TCN, MLP
 bn: False
 
-augment_pos: model # input, model
+# augment posision
+# choise: [input, model]
+augment_pos: model
 
 # choise in noise, shuffle, flip, random_flip, add_dim, random_collapse, random_resize
 # you must splits by ",", not space.
