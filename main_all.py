@@ -1,4 +1,5 @@
 import itertools
+import logging
 import os
 import time
 
@@ -20,7 +21,7 @@ def main(config):
     for i in range(6):
         for augmenters in itertools.combinations(config['augmenters'], i):
             augmenters = list(augmenters)
-            print(augmenters)
+            logging.info(f'[{cnt}] Augmenters: {augmenters}')
             config['augmenters'] = augmenters
             set_seed(config['seed'])
             t = Train(config, writer)

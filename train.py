@@ -48,6 +48,8 @@ class Train:
             self.dim += 1
             self.add_dim = True
 
+        self.augment_pos = config['augment_pos']
+
         self.model = get_model(config['model_name'], self.dim, self.l_dim)
         self.model.to(self.device)
 
@@ -72,11 +74,18 @@ class Train:
                     x, y = data
                     x = x.to(self.device)
                     y = y.to(self.device)
-                    # if self.transform is not None:
-                    #     x = self.transform(x)
-
                     self.optimizer.zero_grad()
-                    pred = self.model(x, self.transform)
+
+                    if self.augment_pos == 'input' and self.transform is not None:
+                        x = self.transform(x)
+                        pred = self.model(x)
+                    elif self.augment_pos == 'model':
+                        pred = self.model(x, self.transform)
+                    elif self.transform is None:
+                        pred = self.model(x)
+                    else:
+                        raise Exception(f'{self.augment_pos} is not expected.')
+
                     loss = self.loss_fn(pred, y)
                     loss.backward()
                     self.optimizer.step()
@@ -92,14 +101,16 @@ class Train:
                     y = y.to(self.device)
                     pred = self.model(x)
                     val_loss = self.loss_fn(pred, y)
+                    val_acc = perf_metric('acc', y.cpu().numpy(), pred.cpu().numpy())
                     pbar_epoch.set_postfix({
                         'loss': np.array(all_loss).mean(),
                         'val_loss': val_loss.item(),
-                        'val_acc': perf_metric('acc', y.cpu().numpy(), pred.cpu().numpy())
+                        'val_acc': val_acc
                     })
 
                 self.writer.add_scalar('val_loss', val_loss, e)
-                self.early_stopping(val_loss, self.model)
+                self.writer.add_scalar('val_acc', val_acc, e)
+                self.early_stopping(-val_acc, self.model)
                 if self.early_stopping.early_stop:
                     print(f'early stopping {e} / {self.epochs}')
                     self.model.load_state_dict(torch.load('checkpoint.pt'))

@@ -90,8 +90,8 @@ class RandomFlip:
 
     def __call__(self, x: torch.Tensor):
         n = len(x)
-        flip_n = torch.bernoulli(torch.ones(n, 1) * self.p)
-        noflip_n = torch.ones(n, 1) - flip_n
+        flip_n = torch.bernoulli(torch.ones(n, 1) * self.p).to(x.device)
+        noflip_n = torch.ones(n, 1).to(x.device) - flip_n
         x_flip = x.fliplr()
         return flip_n * x_flip + noflip_n * x
 
