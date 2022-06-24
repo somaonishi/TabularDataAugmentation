@@ -110,7 +110,7 @@ class Train:
 
                 self.writer.add_scalar('val_loss', val_loss, e)
                 self.writer.add_scalar('val_acc', val_acc, e)
-                self.early_stopping(-val_acc, self.model)
+                self.early_stopping(val_loss, self.model)
                 if self.early_stopping.early_stop:
                     print(f'early stopping {e} / {self.epochs}')
                     self.model.load_state_dict(torch.load('checkpoint.pt'))

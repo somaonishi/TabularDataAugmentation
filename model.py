@@ -137,7 +137,7 @@ class MLP(nn.Module):
         x = F.relu(self.l1(x))
         if transform is not None:
             x = transform(x.clone())
-        # x = self.bn(x)
+        x = self.bn(x)
         x = F.relu(self.l2(x))
         return self.l3(x)
 
