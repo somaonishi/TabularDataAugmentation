@@ -50,14 +50,9 @@ class Train:
 
         self.augment_pos = config['augment_pos']
 
-        bn_before_augment = config['bn_before_augment'],
-        if self.augment_pos == 'input' or config['augmenters'] == []:
-            bn_before_augment = False
         self.model = get_model(config['model_name'],
                                self.dim,
-                               self.l_dim,
-                               bn_before_augment=bn_before_augment,
-                               use_bn=config['use_bn'])
+                               self.l_dim)
         self.model.to(self.device)
 
         if self.l_dim != 1:

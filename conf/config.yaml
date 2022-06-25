@@ -7,11 +7,9 @@ epochs: 100
 batch_size: 128
 test_batch_size: 10000
 
-opt: SGD
+opt: SGD # SGD, Adam
 
 model_name: # TCN, MLP
-bn_before_augment: False
-use_bn: False
 
 # augment posision
 # choise: [input, model]
