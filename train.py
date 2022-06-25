@@ -50,7 +50,14 @@ class Train:
 
         self.augment_pos = config['augment_pos']
 
-        self.model = get_model(config['model_name'], self.dim, self.l_dim)
+        bn_before_augment = config['bn_before_augment'],
+        if self.augment_pos == 'input' or config['augmenters'] == []:
+            bn_before_augment = False
+        self.model = get_model(config['model_name'],
+                               self.dim,
+                               self.l_dim,
+                               bn_before_augment=bn_before_augment,
+                               use_bn=config['use_bn'])
         self.model.to(self.device)
 
         if self.l_dim != 1:
@@ -58,7 +65,10 @@ class Train:
         else:
             self.loss_fn = nn.BCEWithLogitsLoss()
 
-        self.optimizer = optim.Adam(self.model.parameters(), lr=0.001)
+        if config['opt'] == 'SGD':
+            self.optimizer = optim.SGD(self.model.parameters(), lr=0.01, weight_decay=1e-6, momentum=0.9)
+        elif config['opt'] == 'Adam':
+            self.optimizer = optim.Adam(self.model.parameters())
 
         self.scheduler = StepLR(self.optimizer, step_size=1, gamma=0.99999)
         self.early_stopping = EarlyStopping(patience=config['early_stopping_patience'], path='checkpoint.pt')
@@ -100,21 +110,20 @@ class Train:
                     x = x.to(self.device)
                     y = y.to(self.device)
                     pred = self.model(x)
-                    val_loss = self.loss_fn(pred, y)
+                    val_loss = self.loss_fn(pred, y).item()
                     val_acc = perf_metric('acc', y.cpu().numpy(), pred.cpu().numpy())
                     pbar_epoch.set_postfix({
                         'loss': np.array(all_loss).mean(),
-                        'val_loss': val_loss.item(),
+                        'val_loss': val_loss,
                         'val_acc': val_acc
                     })
-
-                self.writer.add_scalar('val_loss', val_loss, e)
-                self.writer.add_scalar('val_acc', val_acc, e)
-                self.early_stopping(val_loss, self.model)
-                if self.early_stopping.early_stop:
-                    print(f'early stopping {e} / {self.epochs}')
-                    self.model.load_state_dict(torch.load('checkpoint.pt'))
-                    break
+                    self.writer.add_scalar('val_loss', val_loss, e)
+                    self.writer.add_scalar('val_acc', val_acc, e)
+                    self.early_stopping(val_loss, self.model)
+                    if self.early_stopping.early_stop:
+                        print(f'early stopping {e} / {self.epochs}')
+                        self.model.load_state_dict(torch.load('checkpoint.pt'))
+                        break
 
     def test(self):
         test_loader = DataLoader(self.test_set, self.test_batch_size)

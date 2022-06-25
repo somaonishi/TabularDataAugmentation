@@ -7,8 +7,11 @@ epochs: 100
 batch_size: 128
 test_batch_size: 10000
 
-model_name: TCN # TCN, MLP
-bn: False
+opt: SGD
+
+model_name: # TCN, MLP
+bn_before_augment: False
+use_bn: False
 
 # augment posision
 # choise: [input, model]
@@ -18,7 +21,7 @@ augment_pos: model
 # you must splits by ",", not space.
 augment:
   random_flip: 0.5 # p
-  noise: 2. # esp
+  noise: 2.0 # esp
   random_collapse: 0.2 # p
   shuffle: 0.4 # p
   random_resize: 0.3 # p

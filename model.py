@@ -126,27 +126,37 @@ class TCN(nn.Module):
 
 
 class MLP(nn.Module):
-    def __init__(self, in_dim, out_dim, h_dim) -> None:
+    def __init__(self, in_dim, out_dim, h_dim, bn_before_augment=False, use_bn=True) -> None:
         super().__init__()
         self.l1 = nn.Linear(in_dim, h_dim)
+        self.bn_before_augment = None
+        if bn_before_augment:
+            self.bn_before_augment = nn.BatchNorm1d(h_dim)
         self.l2 = nn.Linear(h_dim, h_dim)
-        self.bn = nn.BatchNorm1d(h_dim)
+        self.bn = None
+        if use_bn:
+            self.bn = nn.BatchNorm1d(h_dim)
         self.l3 = nn.Linear(h_dim, out_dim)
 
     def forward(self, x: torch.Tensor, transform=None):
         x = F.relu(self.l1(x))
+        if self.bn_before_augment is not None:
+            x = self.bn_before_augment(x)
+
         if transform is not None:
-            x = transform(x.clone())
-        x = self.bn(x)
+            x = transform(x)
+
+        if self.bn is not None:
+            x = self.bn(x)
         x = F.relu(self.l2(x))
         return self.l3(x)
 
 
-def get_model(name, in_dim, out_dim):
+def get_model(name, in_dim, out_dim, h_dim=128, bn_before_augment=False, use_bn=True):
     if name == "TCN":
         return TCN(in_dim, out_dim)
     if name == "MLP":
-        return MLP(in_dim, out_dim, in_dim)
+        return MLP(in_dim, out_dim, h_dim, bn_before_augment, use_bn)
 
 
 if __name__ == '__main__':
