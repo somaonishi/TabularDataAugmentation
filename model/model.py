@@ -145,8 +145,10 @@ class MLP(nn.Module):
 def get_model(name, in_dim, out_dim, h_dim=128):
     if name == "TCN":
         return TCN(in_dim, out_dim)
-    if name == "MLP":
+    elif name == "MLP":
         return MLP(in_dim, out_dim, h_dim)
+    else:
+        raise Exception(f'{name} is not expected.')
 
 
 if __name__ == '__main__':

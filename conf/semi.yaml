@@ -1,0 +1,73 @@
+data_dir: dataset
+
+data_name: mnist # iris, wine, boston, mnist, income
+scalar: standard
+
+epochs: 1000
+batch_size: 128
+test_batch_size: 10000
+
+labeled_rate: 0.1
+beta: 1
+
+opt: SGD # SGD, Adam
+
+model_name: MLP # TCN, MLP
+
+# augment posision
+# choise: [input, model]
+augment_pos: model
+
+# choise in noise, shuffle, flip, random_flip, add_dim, random_collapse, random_resize
+# you must splits by ",", not space.
+augment:
+  random_flip: 0.3 # p
+  noise: 1. # esp
+  random_collapse: 0.1 # p
+  shuffle: 0.3 # p
+  random_resize: 0.3 # p
+
+augmenters:
+  - random_flip
+  - noise
+  - random_collapse
+  # - shuffle
+  - random_resize
+
+method: fixmatch
+semi_para:
+  normal:
+    k: 5
+  fixmatch:
+    strong:
+      random_flip: 0.5 # p
+      noise: 2.0 # esp
+      random_collapse: 0.5 # p
+      shuffle: 0.5 # p
+      random_resize: 0.5 # p
+
+early_stopping_patience: 50
+
+seed: 42
+
+# defaults:
+#   - override hydra/sweeper: ax
+hydra:
+  run:
+    dir: outputs/single/${hydra.job.name}/semi/${data_name}/${augment_pos}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: outputs/multirun/${hydra.job.name}/semi/${data_name}/${augment_pos}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    subdir: ${hydra.job.num}
+  # sweeper:
+  #   ax_config:
+  #     max_trials: 1000  # 最大試行回数
+  #     early_stop:
+  #       minimize: false
+  #       max_epochs_without_improvement: 100
+  #     experiment:
+  #       minimize: false  # 最適化の方向
+
+  #     # 最適化対象のハイパーパラメータ
+
+        
+        

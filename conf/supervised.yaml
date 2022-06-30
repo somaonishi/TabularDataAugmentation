@@ -9,7 +9,7 @@ test_batch_size: 10000
 
 opt: SGD # SGD, Adam
 
-model_name: # TCN, MLP
+model_name: MLP # TCN, MLP
 
 # augment posision
 # choise: [input, model]
@@ -18,17 +18,27 @@ augment_pos: model
 # choise in noise, shuffle, flip, random_flip, add_dim, random_collapse, random_resize
 # you must splits by ",", not space.
 augment:
-  random_flip: 0.5 # p
-  noise: 2.0 # esp
-  random_collapse: 0.2 # p
-  shuffle: 0.4 # p
-  random_resize: 0.3 # p
+  random_flip:
+    p: 0.5
+  noise:
+    eps: 0.1
+  random_collapse:
+    p: 0.2
+  shuffle:
+    p: 0.4
+  random_resize:
+    p: 0.3
+  random_erasing: 
+    p: 0.5
+    erasing_rate: 0.3
 
-augmenters: [random_flip,
+augmenters: [
+             random_flip,
              noise, 
              random_collapse, 
-             shuffle, 
-             random_resize
+            #  shuffle,
+             random_resize,
+             random_erasing,
              ]
 
 early_stopping_patience: 10
@@ -39,9 +49,9 @@ seed: 42
 #   - override hydra/sweeper: ax
 hydra:
   run:
-    dir: outputs/single/${hydra.job.name}/${data_name}/${augment_pos}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    dir: outputs/single/${hydra.job.name}/supervised/${data_name}/${augment_pos}/${now:%Y-%m-%d}/${now:%H-%M-%S}
   sweep:
-    dir: outputs/multirun/${hydra.job.name}/${data_name}/${augment_pos}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    dir: outputs/multirun/${hydra.job.name}/supervised/${data_name}/${augment_pos}/${now:%Y-%m-%d}/${now:%H-%M-%S}
     subdir: ${hydra.job.num}
   # sweeper:
   #   ax_config:

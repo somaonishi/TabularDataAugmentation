@@ -8,8 +8,8 @@ import torchvision
 from sklearn.datasets import load_boston, load_iris, load_wine
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
-from torch.utils.data import Dataset
 
+from .dataset import TabularDataset
 from .utils import (categorical2onehot_sklearn, mode_missing_feature,
                     remove_missing_feature)
 
@@ -17,22 +17,6 @@ income_columns = ['age', 'workclass', 'fnlwgt', 'education',
                   'education-num', 'marital-status', 'occupation',
                   'relationship', 'race', 'sex', 'capital-gain',
                   'capital-loss', 'hours-per-week', 'native-country', 'income']
-
-
-class TabularDataset(Dataset):
-    def __init__(self, x, y, transform=None):
-        self.x = torch.tensor(x).to(torch.float)
-        self.y = torch.tensor(y).to(torch.float)
-        self.transform = transform
-
-    def __len__(self):
-        return len(self.y)
-
-    def __getitem__(self, index):
-        x, y = self.x[index], self.y[index]
-        if self.transform is not None:
-            x = self.transform(x)
-        return x, y
 
 
 def read_csv(path, label, columns, missing_fn=None, header=None) -> Union[pd.DataFrame, pd.DataFrame]:
@@ -118,10 +102,6 @@ def get_dataset(config):
         scalar.fit(x_train[:, cate_num:])
         x_train[:, cate_num:] = scalar.transform(x_train[:, cate_num:])
         x_test[:, cate_num:] = scalar.transform(x_test[:, cate_num:])
-
-    if y_train.shape[-1] == 2:
-        y_train = y_train.argmax(axis=1).reshape(-1, 1)
-        y_test = y_test.argmax(axis=1).reshape(-1, 1)
 
     idx = np.random.permutation(len(x_train))
     train_idx = idx[:int(len(idx) * 0.9)]
