@@ -1,17 +1,26 @@
+import argparse
 import itertools
 import logging
 import os
 import time
 
 import hydra
+from hydra._internal.utils import get_args
 from torch.utils.tensorboard import SummaryWriter
 
-from train import Train
+from train import SemiTrainer, SupervisedTrainer
 from utils import set_seed
 
 
-@hydra.main(config_path='conf', config_name='config')
+@hydra.main(config_path='conf', config_name='supervised')
 def main(config):
+    args = get_args()
+    print(args.config_name)
+    if args.config_name is not None:
+        train_method = args.config_name
+    else:
+        train_method = 'supervised'
+
     config['data_dir'] = os.path.join(hydra.utils.get_original_cwd(), config['data_dir'])
     writer = SummaryWriter('./')
     ori_augmenters = config['augmenters']
@@ -24,7 +33,14 @@ def main(config):
             logging.info(f'[{cnt}] Augmenters: {augmenters}')
             config['augmenters'] = augmenters
             set_seed(config['seed'])
-            t = Train(config, writer)
+
+            if train_method == 'supervised':
+                t = SupervisedTrainer(config, writer)
+            elif train_method == 'semi':
+                t = SemiTrainer(config, writer)
+            else:
+                raise Exception(f'train method\'s {train_method} is unexpected.')
+
             t.train()
             acc = t.test()
             writer.add_scalar('acc', acc, cnt)
