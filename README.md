@@ -19,6 +19,13 @@ python main.py
 python main_all.py
 ```
 
+## Trainingモードの変更
+ディレクトリ`conf`の直下に各configファイルが存在する。以下のようなオプションにすることでモードが切り替わる。
+```bash
+python main.py --config-name CONFIG_NAME
+```
+`semi`で学習したい場合はCONFIG_NAME -> semi とすれば良い。
+
 ## Config.yaml
 以下をいじることでaugmentするアルゴリズムを切り替えられる。
 ```yaml
