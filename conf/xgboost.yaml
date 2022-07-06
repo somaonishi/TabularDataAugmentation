@@ -1,0 +1,28 @@
+data_dir: dataset
+
+data_name: mnist # iris, wine, boston, mnist, income
+scalar: standard
+
+seed: 42
+
+# defaults:
+#   - override hydra/sweeper: ax
+hydra:
+  run:
+    dir: outputs/single/${hydra.job.name}/xgboost/${data_name}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: outputs/multirun/${hydra.job.name}/xgboost/${data_name}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+    subdir: ${hydra.job.num}
+  # sweeper:
+  #   ax_config:
+  #     max_trials: 1000  # 最大試行回数
+  #     early_stop:
+  #       minimize: false
+  #       max_epochs_without_improvement: 100
+  #     experiment:
+  #       minimize: false  # 最適化の方向
+
+  #     # 最適化対象のハイパーパラメータ
+
+        
+        
