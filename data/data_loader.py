@@ -3,7 +3,6 @@ from typing import Union
 
 import numpy as np
 import pandas as pd
-import torch
 import torchvision
 from sklearn.datasets import load_boston, load_iris, load_wine
 from sklearn.model_selection import train_test_split
@@ -19,10 +18,12 @@ income_columns = ['age', 'workclass', 'fnlwgt', 'education',
                   'capital-loss', 'hours-per-week', 'native-country', 'income']
 
 
-def read_csv(path, label, columns, missing_fn=None, header=None) -> Union[pd.DataFrame, pd.DataFrame]:
+def read_csv(path, label=None, columns=None, missing_fn=None, header=None) -> Union[pd.DataFrame, pd.DataFrame]:
     df = pd.read_csv(path, header=header, names=columns)
     if missing_fn is not None:
         df = missing_fn(df)
+    if label is None:
+        label = len(df.columns) - 1
     y = df.pop(label)
     return df, y
 
@@ -91,6 +92,28 @@ def get_dataset(config):
         # " <=50k.", ">50k." to " <=50k", ">50k"
         y_test_df = pd.DataFrame([s.rstrip('.') for s in y_test_df.values])
         x_train, y_train, x_test, y_test, cate_num = categorical2onehot_sklearn(x_train_df, y_train_df, x_test_df, y_test_df)
+    elif data_name == 'covertype':
+        x_df, y_df = read_csv(os.path.join(data_dir, 'covertype/covertype.csv'))
+        x_train, x_test, y_train, y_test = train_test_split(x_df, y_df, test_size=0.2, random_state=42)
+        x_train = x_train.to_numpy()
+        x_test = x_test.to_numpy()
+        y_train = np.identity(8)[y_train]
+        y_test = np.identity(8)[y_test]
+        y_train = np.delete(y_train, 0, 1)
+        y_test = np.delete(y_test, 0, 1)
+    elif data_name == 'blog':
+        # Label data is in column 280
+        x_train, y_train = read_csv(os.path.join(data_dir, 'blog/blogData_train.csv'), 280, columns=None, missing_fn=None)
+        x_test, y_test = read_csv(os.path.join(data_dir, 'blog/blogData_test.csv'), 280, columns=None, missing_fn=None)
+        print(len(x_test) / (len(x_test) + len(x_train)))
+        x_train = x_train.to_numpy()
+        x_test = x_test.to_numpy()
+        y_train = np.sign(y_train)
+        y_train = y_train.astype(int)
+        y_train = np.identity(2)[y_train]
+        y_test = np.sign(y_test)
+        y_test = y_test.astype(int)
+        y_test = np.identity(2)[y_test]
 
     scalar = None
     if scalar_name == 'minmax':

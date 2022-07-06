@@ -1,6 +1,6 @@
 data_dir: dataset
 
-data_name: 'income' # iris, wine, boston, mnist, income
+data_name: 'income' # iris, wine, boston, mnist, income, blog, covertype
 scalar: standard
 
 epochs: 100
