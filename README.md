@@ -24,7 +24,10 @@ python main_all.py
 ```bash
 python main.py --config-name CONFIG_NAME
 ```
-`semi`で学習したい場合はCONFIG_NAME -> semi とすれば良い。
+`semi`で学習したい場合は
+```bash
+python main.py --config-name semi
+```
 
 ## Config.yaml
 以下をいじることでaugmentするアルゴリズムを切り替えられる。
