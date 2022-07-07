@@ -37,13 +37,17 @@ class BaseTrainer:
 
         self.loss_fn = nn.CrossEntropyLoss()
 
-        if config['opt'] == 'SGD':
-            self.optimizer = optim.SGD(self.model.parameters(), lr=0.01, weight_decay=1e-6, momentum=0.9)
-        elif config['opt'] == 'Adam':
-            self.optimizer = optim.Adam(self.model.parameters())
+        self.opt_alg = config['opt']
+        self.set_optimizer()
 
         self.scheduler = StepLR(self.optimizer, step_size=1, gamma=0.99999)
         self.early_stopping = EarlyStopping(patience=config['early_stopping_patience'], path='checkpoint.pt')
+
+    def set_optimizer(self):
+        if self.opt_alg == 'SGD':
+            self.optimizer = optim.SGD(self.model.parameters(), lr=0.01, weight_decay=1e-6, momentum=0.9)
+        elif self.opt_alg == 'Adam':
+            self.optimizer = optim.Adam(self.model.parameters())
 
     def train(self):
         raise NotImplementedError()

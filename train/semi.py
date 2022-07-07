@@ -100,6 +100,9 @@ class SemiTrainer(BaseTrainer):
         return loss, l_loss, u_loss
 
     def train(self):
+        self.semi_train()
+
+    def semi_train(self):
         train_loader = DataLoader(self.train_set, self.batch_size, shuffle=True)
         for e in range(self.epochs):
             with tqdm(total=len(train_loader), bar_format="{l_bar}{bar}{r_bar}{bar:-10b}") as pbar_epoch:

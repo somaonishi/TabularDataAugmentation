@@ -5,7 +5,7 @@ import hydra
 from hydra._internal.utils import get_args
 from torch.utils.tensorboard import SummaryWriter
 
-from train import SemiTrainer, SupervisedTrainer, XGBoostTrainer
+from train import SemiTrainer, SupervisedTrainer, XGBoostTrainer, SelfSemiTrainer
 from utils import set_seed
 
 
@@ -27,6 +27,8 @@ def main(config):
         t = SemiTrainer(config, writer)
     elif train_method == 'xgboost':
         t = XGBoostTrainer(config, writer)
+    elif train_method == 'selfsemi':
+        t = SelfSemiTrainer(config, writer)
     else:
         raise Exception(f'train method\'s {train_method} is unexpected.')
     t.train()

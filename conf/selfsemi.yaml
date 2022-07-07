@@ -11,6 +11,7 @@ labeled_rate: 0.1
 beta: 1
 
 opt: SGD # SGD, Adam
+self_opt: RMSprop # RMSprop, Adam
 
 model_name: MLP # TCN, MLP
 
