@@ -3,6 +3,8 @@ data_dir: dataset
 data_name: mnist # iris, wine, boston, mnist, income, blog, covertype
 scalar: standard
 
+labeled_rate: 0.1
+
 seed: 42
 
 # defaults:

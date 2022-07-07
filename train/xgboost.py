@@ -10,8 +10,10 @@ from train.base import BaseTrainer
 log = logging.getLogger(__name__)
 
 
-def get_dmatrix(dataset):
+def get_dmatrix(dataset, labeled_rate=1.0):
     x, y = dataset.x, dataset.y
+    size = int(len(x) * labeled_rate)
+    x, y = x[:size], y[:size]
     y = y.argmax(axis=1).reshape(-1, 1)
     return xgb.DMatrix(x.numpy(), label=y.numpy())
 
@@ -21,10 +23,11 @@ class XGBoostTrainer:
         self.writer = writer
         self.train_set, self.val_set, self.test_set = get_dataset(config)
         self.l_dim = self.train_set[0][1].shape[-1]
+        self.labeled_rate = config["labeled_rate"]
 
     def train(self):
-        dtrain = get_dmatrix(self.train_set)
-        dvalid = get_dmatrix(self.val_set)
+        dtrain = get_dmatrix(self.train_set, self.labeled_rate)
+        dvalid = get_dmatrix(self.val_set, self.labeled_rate)
         params = {
             'objective': 'multi:softprob',
             'num_class': self.l_dim,

@@ -1,6 +1,6 @@
 data_dir: dataset
 
-data_name: mnist # iris, wine, boston, mnist, income, blog, covertype
+data_name: blog # iris, wine, boston, mnist, income, blog, covertype
 scalar: standard
 
 epochs: 1000
@@ -18,21 +18,29 @@ model_name: MLP # TCN, MLP
 # choise: [input, model]
 augment_pos: model
 
-# choise in noise, shuffle, flip, random_flip, add_dim, random_collapse, random_resize
-# you must splits by ",", not space.
 augment:
-  random_flip: 0.3 # p
-  noise: 1. # esp
-  random_collapse: 0.1 # p
-  shuffle: 0.3 # p
-  random_resize: 0.3 # p
+  random_flip:
+    p: 0.5
+  noise:
+    eps: 0.1
+  random_collapse:
+    p: 0.2
+  shuffle:
+    p: 0.4
+  random_resize:
+    p: 0.3
+  random_erasing: 
+    p: 0.5
+    erasing_rate: 0.3
 
-augmenters:
-  - random_flip
-  - noise
-  - random_collapse
-  # - shuffle
-  - random_resize
+augmenters: [
+             random_flip,
+             noise,
+             random_collapse,
+            #  shuffle,
+             random_resize,
+             random_erasing,
+             ]
 
 method: fixmatch
 semi_para:
@@ -40,11 +48,19 @@ semi_para:
     k: 5
   fixmatch:
     strong:
-      random_flip: 0.5 # p
-      noise: 2.0 # esp
-      random_collapse: 0.5 # p
-      shuffle: 0.5 # p
-      random_resize: 0.5 # p
+        random_flip:
+          p: 0.5
+        noise:
+          eps: 1.
+        random_collapse:
+          p: 0.5
+        shuffle:
+          p: 0.5
+        random_resize:
+          p: 0.5
+        random_erasing:
+          p: 0.5
+          erasing_rate: 0.5
 
 early_stopping_patience: 50
 

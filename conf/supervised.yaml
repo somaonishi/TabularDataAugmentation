@@ -15,8 +15,6 @@ model_name: MLP # TCN, MLP
 # choise: [input, model]
 augment_pos: model
 
-# choise in noise, shuffle, flip, random_flip, add_dim, random_collapse, random_resize
-# you must splits by ",", not space.
 augment:
   random_flip:
     p: 0.5
