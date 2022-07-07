@@ -1,6 +1,5 @@
 import numpy as np
 import torch
-import torch.nn as nn
 from data.augment import get_transforms
 from data.dataset import SemiDataset, TabularDataset
 from torch.utils.data import DataLoader

@@ -1,11 +1,9 @@
 import logging
 
 from data.data_loader import get_dataset
-from torch.utils.data import DataLoader
 from utils import perf_metric
 
 import xgboost as xgb
-from train.base import BaseTrainer
 
 log = logging.getLogger(__name__)
 
