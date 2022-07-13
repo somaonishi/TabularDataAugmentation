@@ -9,7 +9,6 @@ class Encoder(nn.Module):
         self.l1 = nn.Linear(in_dim, h_dim)
 
     def forward(self, x: torch.Tensor, transform=None):
-        return x
         x = F.relu(self.l1(x))
         if transform is not None:
             x = transform(x)

@@ -32,3 +32,4 @@ class SemiDataset(Dataset):
     def __getitem__(self, idx):
         uidx = np.random.randint(0, len(self.u_x))
         return self.l_x[idx], self.l_y[idx], self.u_x[uidx]
+
