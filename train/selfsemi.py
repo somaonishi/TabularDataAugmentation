@@ -11,23 +11,16 @@ from tqdm import tqdm
 from .semi import SemiTrainer
 
 
-def self_to_unlabel(train_set: TabularDataset, val_set: TabularDataset):
-    x_train, y_train = train_set.x.numpy(), train_set.y.numpy()
-    x_val, y_val = val_set.x.numpy(), val_set.y.numpy()
-    x = np.concatenate([x_train, x_val])
-    y = np.concatenate([y_train, y_val])
-    return TabularDataset(x, y)
-
-
 class SelfSemiTrainer(SemiTrainer):
     def __init__(self, config, writer=None) -> None:
         super().__init__(config, writer)
-        self.self_train_set, self.self_val_set, self.self_test_set = get_dataset(config)
+        # self.self_train_set, self.self_val_set, self.self_test_set = get_dataset(config)
         self.self_opt_alg = config['self_opt']
         self.ae = AE(self.dim, self.dim).to(self.device)
         self.self_lossfn = nn.MSELoss()
         self.self_epochs = config['self_epochs']
-        self.self_train_set = self_to_unlabel(self.self_train_set, self.self_val_set)
+        # self.self_train_set = self_to_unlabel(self.self_train_set, self.self_val_set)
+        self.self_train_set = np.concatenate([self.train_set.l_x, self.train_set.u_x, self.val_set.x])
         self.self_set_optimizer()
 
     def self_set_optimizer(self):
@@ -41,7 +34,7 @@ class SelfSemiTrainer(SemiTrainer):
         for e in range(self.self_epochs):
             with tqdm(train_loader, bar_format="{l_bar}{bar:20}{r_bar}{bar:-10b}") as pbar_epoch:
                 for data in pbar_epoch:
-                    x, _ = data
+                    x = data
                     x = x.to(self.device)
                     self.self_optimizer.zero_grad()
                     pred = self.ae(x)
