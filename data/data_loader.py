@@ -50,7 +50,6 @@ def get_dataset(config):
     data_name = config['data_name']
     data_dir = config['data_dir']
     scalar_name = config['scalar']
-    cate_num = 0
 
     if data_name == 'iris':
         data = load_iris()
@@ -60,6 +59,7 @@ def get_dataset(config):
             data.target,
             test_size=0.2,
             random_state=42)
+        numerical_idx = [i for i in range(x_train.shape[1])]
     elif data_name == 'wine':
         data = load_wine()
         data.target = np.asarray(pd.get_dummies(data.target))
@@ -68,6 +68,7 @@ def get_dataset(config):
             data.target,
             test_size=0.2,
             random_state=42)
+        numerical_idx = [i for i in range(x_train.shape[1])]
     elif data_name == 'boston':
         data = load_boston()
         data.target = np.asarray(pd.get_dummies(data.target))
@@ -76,11 +77,13 @@ def get_dataset(config):
             data.target,
             test_size=0.2,
             random_state=42)
+        numerical_idx = [i for i in range(x_train.shape[1])]
     elif data_name == 'mnist':
         train_set = torchvision.datasets.MNIST(data_dir, train=True, download=True)
         test_set = torchvision.datasets.MNIST(data_dir, train=False, download=True)
         x_train, y_train = mnist_to_tabular(train_set.data.numpy(), train_set.targets.numpy())
         x_test, y_test = mnist_to_tabular(test_set.data.numpy(), test_set.targets.numpy())
+        numerical_idx = [i for i in range(x_train.shape[1])]
     elif data_name == 'income':
         missing_fn = remove_missing_feature
         missing_fn = mode_missing_feature
@@ -91,7 +94,7 @@ def get_dataset(config):
         x_test_df.pop('education-num')
         # " <=50k.", ">50k." to " <=50k", ">50k"
         y_test_df = pd.DataFrame([s.rstrip('.') for s in y_test_df.values])
-        x_train, y_train, x_test, y_test, cate_num = categorical2onehot_sklearn(x_train_df, y_train_df, x_test_df, y_test_df)
+        x_train, y_train, x_test, y_test, numerical_idx = categorical2onehot_sklearn(x_train_df, y_train_df, x_test_df, y_test_df)
     elif data_name == 'covertype':
         x_df, y_df = read_csv(os.path.join(data_dir, 'covertype/covertype.csv'))
         x_train, x_test, y_train, y_test = train_test_split(x_df, y_df, test_size=0.2, random_state=42)
@@ -101,6 +104,7 @@ def get_dataset(config):
         y_test = np.identity(8)[y_test]
         y_train = np.delete(y_train, 0, 1)
         y_test = np.delete(y_test, 0, 1)
+        numerical_idx = [i for i in range(x_train.shape[1])]
     elif data_name == 'blog':
         # Label data is in column 280
         x_train, y_train = read_csv(os.path.join(data_dir, 'blog/blogData_train.csv'), 280, columns=None, missing_fn=None)
@@ -114,6 +118,10 @@ def get_dataset(config):
         y_test = np.sign(y_test)
         y_test = y_test.astype(int)
         y_test = np.identity(2)[y_test]
+        cate_idx = [i for i in range(62, 276)]
+        numerical_idx = [i for i in range(x_train.shape[1]) if i not in cate_idx]
+    
+    print(numerical_idx)
 
     scalar = None
     if scalar_name == 'minmax':
@@ -122,9 +130,9 @@ def get_dataset(config):
         scalar = StandardScaler()
 
     if scalar is not None:
-        scalar.fit(x_train[:, cate_num:])
-        x_train[:, cate_num:] = scalar.transform(x_train[:, cate_num:])
-        x_test[:, cate_num:] = scalar.transform(x_test[:, cate_num:])
+        scalar.fit(x_train[:, numerical_idx])
+        x_train[:, numerical_idx] = scalar.transform(x_train[:, numerical_idx])
+        x_test[:, numerical_idx] = scalar.transform(x_test[:, numerical_idx])
 
     idx = np.random.permutation(len(x_train))
     train_idx = idx[:int(len(idx) * 0.9)]
