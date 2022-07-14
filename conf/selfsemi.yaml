@@ -44,7 +44,7 @@ augmenters: [
              random_erasing,
              ]
 
-method: fixmatch
+method: normal
 semi_para:
   normal:
     k: 5

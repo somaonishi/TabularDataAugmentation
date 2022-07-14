@@ -14,12 +14,10 @@ from .semi import SemiTrainer
 class SelfSemiTrainer(SemiTrainer):
     def __init__(self, config, writer=None) -> None:
         super().__init__(config, writer)
-        # self.self_train_set, self.self_val_set, self.self_test_set = get_dataset(config)
         self.self_opt_alg = config['self_opt']
         self.ae = AE(self.dim, self.dim).to(self.device)
         self.self_lossfn = nn.MSELoss()
         self.self_epochs = config['self_epochs']
-        # self.self_train_set = self_to_unlabel(self.self_train_set, self.self_val_set)
         self.self_train_set = np.concatenate([self.train_set.l_x, self.train_set.u_x, self.val_set.x])
         self.self_set_optimizer()
 
@@ -43,7 +41,6 @@ class SelfSemiTrainer(SemiTrainer):
                     self.self_optimizer.step()
                     pbar_epoch.set_description(f"epoch[{e + 1} / {self.self_epochs}]")
                     pbar_epoch.set_postfix({'loss': loss.item()})
-            self.scheduler.step()
 
     def train(self):
         self.self_train()
