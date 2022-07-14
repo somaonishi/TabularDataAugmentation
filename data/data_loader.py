@@ -120,8 +120,6 @@ def get_dataset(config):
         y_test = np.identity(2)[y_test]
         cate_idx = [i for i in range(62, 276)]
         numerical_idx = [i for i in range(x_train.shape[1]) if i not in cate_idx]
-    
-    print(numerical_idx)
 
     scalar = None
     if scalar_name == 'minmax':
