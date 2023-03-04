@@ -1,36 +1,36 @@
-# Tabular Data Augmentation
-## 環境
+## Tabular Data Augmentation
+## Environment
 - python 3.8.10
 - wsl
 
-## 環境構築
+## Build environment
 ```bash
 python -m venv venv
 . venv/bin/activate
 pip install -r requirements.txt
 ```
 
-## 実行コマンド
+## Run command
 ```bash
-# augmenters通りにDAされる
+# DA is applied as per augmenters
 python main.py
 
-## augmentersの全組み合わせが実行される
+# All combinations of augmenters are executed
 python main_all.py
 ```
 
-## Trainingモードの変更
-ディレクトリ`conf`の直下に各configファイルが存在する。以下のようなオプションにすることでモードが切り替わる。
+## Change training mode
+Each config file exists directly under the directory `conf`. The mode can be switched by using the following options.
 ```bash
 python main.py --config-name CONFIG_NAME
-```
-`semi`で学習したい場合は
-```bash
+````
+If you want to learn with `semi`, use
+````bash
 python main.py --config-name semi
-```
+````
 
 ## Config.yaml
-以下をいじることでaugmentするアルゴリズムを切り替えられる。
+You can switch the algorithm for data augmentation by modifying the following.
 ```yaml
 augmenters: [random_flip,
              noise, 
@@ -38,9 +38,9 @@ augmenters: [random_flip,
              shuffle, 
              random_resize
              ]
-```
-例えば、`noise`だけかけたい時は以下のようにする。
+````
+For example, if you want to apply only `noise` data augmentation, use the following.
 ```yaml
-augmenters: [noise]
+augmenters: [noise].
 ```
  
